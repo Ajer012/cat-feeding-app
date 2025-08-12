@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Feeding Tracker</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cat Tracker">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .cat-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .fed-button {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            border: none;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            padding: 20px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .fed-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        .fed-button:active {
+            transform: translateY(0);
+        }
+
+        .status {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .last-fed {
+            font-size: 16px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .time-display {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .timer {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffeb3b;
+            margin-top: 10px;
+        }
+
+        .stats {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-item {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+            font-size: 12px;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: 16px;
+            color: #ffeb3b;
+        }
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .history-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .history {
+            display: none;
+            margin-top: 20px;
+            text-align: left;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .clear-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 10px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .clear-button:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .fed-button {
+                font-size: 20px;
+                padding: 18px 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="cat-icon">🐱</span>
+        <h1>Cat Feeding Tracker</h1>
+        
+        <button class="fed-button" onclick="markFed()">
+            🍽️ Fed!
+        </button>
+        
+        <div class="status">
+            <div class="last-fed">Last fed:</div>
+            <div class="time-display" id="lastFedTime">Never</div>
+            <div class="timer" id="timeSince">--</div>
+        </div>
+        
+        <div class="stats" id="stats" style="display: none;">
+            <div class="stat-item">
+                <div class="stat-label">Average time between feeds:</div>
+                <div class="stat-value" id="averageTime">--</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Total feedings recorded:</div>
+                <div class="stat-value" id="totalFeedings">--</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Longest gap:</div>
+                <div class="stat-value" id="longestGap">--</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Shortest gap:</div>
+                <div class="stat-value" id="shortestGap">--</div>
+            </div>
+        </div>
+        
+        <button class="history-button" onclick="toggleHistory()">
+            📋 View History
+        </button>
+        
+        <div class="history" id="history">
+            <div id="historyList"></div>
+            <button class="clear-button" onclick="clearHistory()">Clear History</button>
+        </div>
+    </div>
+
+    <script>
+        let feedingHistory = [];
+        let timerInterval;
+
+        // Load data on page load
+        window.addEventListener('load', function() {
+            loadData();
+            updateDisplay();
+            startTimer();
+        });
+
+        function loadData() {
+            const saved = localStorage.getItem('catFeedingData');
+            if (saved) {
+                feedingHistory = JSON.parse(saved);
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('catFeedingData', JSON.stringify(feedingHistory));
+        }
+
+        function markFed() {
+            const now = new Date();
+            feedingHistory.unshift({
+                timestamp: now.toISOString(),
+                displayTime: now.toLocaleString()
+            });
+            
+            // Keep only last 20 entries
+            if (feedingHistory.length > 20) {
+                feedingHistory = feedingHistory.slice(0, 20);
+            }
+            
+            saveData();
+            updateDisplay();
+            
+            // Add a little animation feedback
+            const button = document.querySelector('.fed-button');
+            button.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+            }, 150);
+        }
+
+        function updateDisplay() {
+            const lastFedElement = document.getElementById('lastFedTime');
+            const timeSinceElement = document.getElementById('timeSince');
+            
+            if (feedingHistory.length === 0) {
+                lastFedElement.textContent = 'Never';
+                timeSinceElement.textContent = '--';
+                document.getElementById('stats').style.display = 'none';
+                return;
+            }
+            
+            const lastFed = new Date(feedingHistory[0].timestamp);
+            lastFedElement.textContent = lastFed.toLocaleString();
+            
+            updateTimeSince();
+            updateHistory();
+            updateStats();
+        }
+
+        function updateTimeSince() {
+            if (feedingHistory.length === 0) return;
+            
+            const lastFed = new Date(feedingHistory[0].timestamp);
+            const now = new Date();
+            const diff = now - lastFed;
+            
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            const timeSinceElement = document.getElementById('timeSince');
+            
+            if (hours === 0 && minutes === 0 && seconds < 30) {
+                timeSinceElement.textContent = 'Just fed!';
+            } else if (hours === 0 && minutes === 0) {
+                timeSinceElement.textContent = `${seconds} second${seconds !== 1 ? 's' : ''} ago`;
+            } else if (hours === 0) {
+                timeSinceElement.textContent = `${minutes}m ${seconds}s ago`;
+            } else {
+                timeSinceElement.textContent = `${hours}h ${minutes}m ${seconds}s ago`;
+            }
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimeSince, 1000); // Update every second
+        }
+
+        function toggleHistory() {
+            const history = document.getElementById('history');
+            const button = document.querySelector('.history-button');
+            
+            if (history.style.display === 'none' || history.style.display === '') {
+                history.style.display = 'block';
+                button.textContent = '📋 Hide History';
+                updateHistory();
+            } else {
+                history.style.display = 'none';
+                button.textContent = '📋 View History';
+            }
+        }
+
+        function updateHistory() {
+            const historyList = document.getElementById('historyList');
+            
+            if (feedingHistory.length === 0) {
+                historyList.innerHTML = '<div class="history-item">No feeding history yet</div>';
+                return;
+            }
+            
+            historyList.innerHTML = feedingHistory
+                .map(entry => `<div class="history-item">${entry.displayTime}</div>`)
+                .join('');
+        }
+
+        function updateStats() {
+            if (feedingHistory.length < 2) {
+                document.getElementById('stats').style.display = 'none';
+                return;
+            }
+            
+            // Calculate gaps between feedings
+            const gaps = [];
+            for (let i = 0; i < feedingHistory.length - 1; i++) {
+                const current = new Date(feedingHistory[i].timestamp);
+                const next = new Date(feedingHistory[i + 1].timestamp);
+                const gap = current - next; // gap in milliseconds
+                gaps.push(gap);
+            }
+            
+            if (gaps.length === 0) return;
+            
+            // Calculate average
+            const averageMs = gaps.reduce((sum, gap) => sum + gap, 0) / gaps.length;
+            const averageHours = Math.floor(averageMs / (1000 * 60 * 60));
+            const averageMinutes = Math.floor((averageMs % (1000 * 60 * 60)) / (1000 * 60));
+            
+            // Find longest and shortest gaps
+            const longestMs = Math.max(...gaps);
+            const shortestMs = Math.min(...gaps);
+            
+            const longestHours = Math.floor(longestMs / (1000 * 60 * 60));
+            const longestMinutes = Math.floor((longestMs % (1000 * 60 * 60)) / (1000 * 60));
+            
+            const shortestHours = Math.floor(shortestMs / (1000 * 60 * 60));
+            const shortestMinutes = Math.floor((shortestMs % (1000 * 60 * 60)) / (1000 * 60));
+            
+            // Update display
+            document.getElementById('averageTime').textContent = 
+                averageHours > 0 ? `${averageHours}h ${averageMinutes}m` : `${averageMinutes}m`;
+            
+            document.getElementById('totalFeedings').textContent = feedingHistory.length;
+            
+            document.getElementById('longestGap').textContent = 
+                longestHours > 0 ? `${longestHours}h ${longestMinutes}m` : `${longestMinutes}m`;
+            
+            document.getElementById('shortestGap').textContent = 
+                shortestHours > 0 ? `${shortestHours}h ${shortestMinutes}m` : `${shortestMinutes}m`;
+            
+            document.getElementById('stats').style.display = 'block';
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all feeding history?')) {
+                feedingHistory = [];
+                saveData();
+                updateDisplay();
+                document.getElementById('history').style.display = 'none';
+                document.querySelector('.history-button').textContent = '📋 View History';
+            }
+        }
+
+        // Update the timer immediately when page becomes visible
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                updateTimeSince();
+            }
+        });
+    </script>
+</body>
+</html>
